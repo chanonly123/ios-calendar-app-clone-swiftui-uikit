@@ -12,18 +12,18 @@ public struct YearItem: Identifiable, Hashable {
     
     public let id: Int
     public var months = [[MonthItem]]()
+    public var monthsFlat = [MonthItem]()
     
     public init(year: Int) {
         self.year = year
         self.id = year
-        var items = [MonthItem]()
         for i in 1...12 {
-            items.append(MonthItem(year: year, month: i))
+            monthsFlat.append(MonthItem(year: year, month: i))
         }
         for i in 0..<4 {
             months.append([])
             for j in 0..<3 {
-                months[i].append(items[i*3+j])
+                months[i].append(monthsFlat[i*3+j])
             }
         }
     }

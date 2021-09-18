@@ -8,12 +8,16 @@
 import Foundation
 
 public struct YearList {
-    var items = [YearItem]()
+    public var years = [YearItem]()
+    public let current: Int
     
-    init() {
-        let current = 2021
-        for i in 0..<10 {
-            items.append(.init(year: i-5+current))
+    public init() {
+        let cal = Calendar.current
+        current = cal.component(.year, from: Date())
+        let min = current-50
+        let max = current+50
+        for i in min...max {
+            years.append(.init(year: i))
         }
     }
     

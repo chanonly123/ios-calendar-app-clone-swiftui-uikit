@@ -33,6 +33,21 @@ public extension UIView {
             bottomAnchor.constraint(equalTo: parent.bottomAnchor, constant: -bottom).isActive = true
         }
     }
+    
+    var isPortrait: Bool {
+        switch UIDevice.current.orientation {
+        case .unknown, .portrait, .portraitUpsideDown, .faceUp, .faceDown:
+            return true
+        case .landscapeLeft, .landscapeRight:
+            return false
+        @unknown default:
+            return true
+        }
+    }
+    
+    var pixelSize: CGFloat {
+        return 1 / UIScreen.main.scale
+    }
 }
 
 #if canImport(SwiftUI) && DEBUG

@@ -29,6 +29,30 @@ struct DayView: View {
     }
 }
 
+extension DayItem {
+    public var backgroundColor: Color {
+        switch type {
+        case .date:
+            return isToday ? .red : .clear
+        case .text:
+            return .clear
+        case .empty:
+            return .clear
+        }
+    }
+    
+    public var foregroundColor: Color {
+        switch type {
+        case .date:
+            return isToday ? .white : .black
+        case .text:
+            return .black
+        case .empty:
+            return .clear
+        }
+    }
+}
+
 struct DayView_Previews: PreviewProvider {
     static var previews: some View {
         VStack {

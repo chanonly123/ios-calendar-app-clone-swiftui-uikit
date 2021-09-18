@@ -8,12 +8,18 @@
 import UIKit
 
 class ViewController: UIViewController {
+    
+    let yearListView = YearListView()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        
+        view = yearListView
     }
-
-
+    
+//    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+//        super.viewWillTransition(to: size, with: coordinator)
+//        yearListView.collectionView.collectionViewLayout.invalidateLayout()
+//    }
 }
 

@@ -6,8 +6,6 @@
 //
 
 import Foundation
-import SwiftUI
-import UIKit
 
 public struct DayItem: Identifiable, Hashable {
     var empty = false
@@ -16,7 +14,7 @@ public struct DayItem: Identifiable, Hashable {
     
     public let id: Int
     let comps: DateComponents
-    let isToday: Bool
+    public let isToday: Bool
     
     public init(empty: Bool = false, text: String = "", date: Date = Date()) {
         self.empty = empty
@@ -43,34 +41,5 @@ public struct DayItem: Identifiable, Hashable {
             return ""
         }
     }
-    
-    public var backgroundUIColor : UIColor {
-        return UIColor(backgroundColor)
-    }
-    
-    public var backgroundColor: Color {
-        switch type {
-        case .date:
-            return isToday ? .red : .clear
-        case .text:
-            return .clear
-        case .empty:
-            return .clear
-        }
-    }
-    
-    public var foregroundUIColor : UIColor {
-        return UIColor(foregroundColor)
-    }
-    
-    public var foregroundColor: Color {
-        switch type {
-        case .date:
-            return isToday ? .white : .black
-        case .text:
-            return .black
-        case .empty:
-            return .clear
-        }
-    }
 }
+    

@@ -9,8 +9,8 @@ import calendar_support
 import Combine
 import UIKit
 
-final class DayView: UICollectionViewCell {
-    let lbl = PaddingLabel()
+class DayView: UICollectionViewCell {
+    let lbl = UILabel()
     var bag = Set<AnyCancellable>()
     
     @Published
@@ -27,19 +27,17 @@ final class DayView: UICollectionViewCell {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        super.init(coder: coder)
+        commonInit()
     }
     
     func commonInit() {
-        addSubview(lbl)
+        contentView.addSubview(lbl)
         
         lbl.textAlignment = .center
         lbl.clipsToBounds = true
-        lbl.font = .systemFont(ofSize: 16)
-        lbl.adjustsFontSizeToFitWidth = true
-        lbl.minimumScaleFactor = 0.01
+        lbl.font = .systemFont(ofSize: 10)
         lbl.baselineAdjustment = .alignCenters
-        lbl.contentInset = .init(top: 2, left: 2, bottom: 2, right: 2)
         
         $item.map { $0.backgroundUIColor }
             .assign(to: \.backgroundColor, on: lbl)
@@ -56,6 +54,30 @@ final class DayView: UICollectionViewCell {
         let size = min(bounds.width, bounds.height)
         lbl.frame = CGRect(x: 0, y: 0, width: size, height: size)
         lbl.center = center
+    }
+}
+
+extension DayItem {
+    public var backgroundUIColor : UIColor {
+        switch type {
+        case .date:
+            return isToday ? .red : .clear
+        case .text:
+            return .clear
+        case .empty:
+            return .clear
+        }
+    }
+    
+    public var foregroundUIColor : UIColor {
+        switch type {
+        case .date:
+            return isToday ? .white : .black
+        case .text:
+            return .black
+        case .empty:
+            return .clear
+        }
     }
 }
 

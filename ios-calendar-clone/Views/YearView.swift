@@ -9,54 +9,27 @@ import calendar_support
 import Combine
 import UIKit
 
-class MonthView: UICollectionViewCell {
+class YearView: UICollectionViewCell {
     var bag = Set<AnyCancellable>()
     
     @Published
-    var item = MonthItem(year: 2021, month: 9)
-    
+    var item = YearItem(year: 2021)
+
+    let lblYear = UILabel()
+    let line = UIView()
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-    let lblMonth = UILabel()
     
-    convenience init(item: MonthItem) {
-        self.init(frame: .zero)
-        self.item = item
-    }
+    let interItemSpacing: CGFloat = 8
+    let lineSpacing: CGFloat = 8
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         commonInit()
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    func commonInit() {
-        backgroundColor = .white
-        
-        contentView.addSubview(lblMonth)
-        lblMonth.font = .systemFont(ofSize: 18)
-        
-        $item.map { $0.monthName }
-            .assign(to: \.text, on: lblMonth)
-            .store(in: &bag)
-        
-        contentView.addSubview(collectionView)
-        collectionView.isScrollEnabled = false
-        collectionView.backgroundColor = .clear
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.register(MonthViewCell.self, forCellWithReuseIdentifier: "MonthViewCell")
-        
-        $item.dropFirst().sink { [unowned self] _ in
-            self.collectionView.reloadData()
-        }.store(in: &bag)
-        
-        lblMonth.addPinConstraints(top: 4, left: 0, bottom: nil, right: 0)
-        collectionView.addPinConstraints(top: nil, left: 0, bottom: 0, right: 0)
-        collectionView.topAnchor.constraint(equalTo: lblMonth.bottomAnchor, constant: 2)
-            .isActive = true
     }
     
     override func layoutSubviews() {
@@ -64,43 +37,67 @@ class MonthView: UICollectionViewCell {
         collectionView.collectionViewLayout.invalidateLayout()
     }
     
-    class MonthViewCell: UICollectionViewCell {
-        let dayView = DayView()
+    func commonInit() {
+        backgroundColor = .white
         
-        override init(frame: CGRect) {
-            super.init(frame: frame)
-            addSubview(dayView)
-        }
+        contentView.addSubview(lblYear)
+        lblYear.font = .boldSystemFont(ofSize: 32)
+        lblYear.textColor = item.isCurrentYear ? .red : .black
         
-        required init?(coder: NSCoder) {
-            fatalError("init(coder:) has not been implemented")
-        }
+        contentView.addSubview(line)
+        line.backgroundColor = .gray
+                
+        contentView.addSubview(collectionView)
+        collectionView.isScrollEnabled = false
+        collectionView.backgroundColor = .clear
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.register(MonthView.self, forCellWithReuseIdentifier: "MonthView")
         
-        override func layoutSubviews() {
-            super.layoutSubviews()
-            dayView.frame = bounds
-        }
+        $item.map { "\($0.year)" }
+            .assign(to: \.text, on: lblYear)
+            .store(in: &bag)
+                
+        $item.dropFirst().sink { [unowned self] _ in
+            self.collectionView.reloadData()
+        }.store(in: &bag)
+        
+        collectionView.addPinConstraints(top: nil, left: 0, bottom: 0, right: 0)
+        lblYear.addPinConstraints(top: 0, left: 0, bottom: nil, right: 0)
+        collectionView.topAnchor.constraint(equalTo: lblYear.bottomAnchor, constant: 16)
+            .isActive = true
+        line.addPinConstraints(left: 0, right: 0)
+        line.heightAnchor.constraint(equalToConstant: pixelSize).isActive = true
+        line.topAnchor.constraint(equalTo: lblYear.bottomAnchor, constant: 2)
+            .isActive = true
     }
 }
 
-extension MonthView: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension YearView: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        item.days.count
+        return 1
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return item.days[section].count
+        return item.monthsFlat.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MonthViewCell", for: indexPath) as! MonthViewCell
-        cell.dayView.item = item.days[indexPath.section][indexPath.item]
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MonthView", for: indexPath) as! MonthView
+        cell.item = item.monthsFlat[indexPath.item]
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = collectionView.bounds.width / 7
-        let height = collectionView.bounds.height / 6
+        var width = collectionView.bounds.width
+        var height = collectionView.bounds.height
+        if isPortrait {
+            width = (width - (interItemSpacing*2)) / 3
+            height = (height - (lineSpacing*3)) / 4
+        } else {
+            width = (width - (interItemSpacing*5)) / 6
+            height = (height - (lineSpacing*1)) / 2
+        }
         return CGSize(width: width, height: height)
     }
     
@@ -109,11 +106,11 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDataSource, UICol
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 0
+        return lineSpacing
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 0
+        return interItemSpacing
     }
 }
 
@@ -121,11 +118,10 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDataSource, UICol
 import SwiftUI
 
 @available(iOS 13.0, *)
-struct MonthViewPreview: PreviewProvider {
+struct YearViewPreview: PreviewProvider {
     static var previews: some View {
-        MonthView()
+        YearView()
             .swiftUIView()
-            .previewLayout(.fixed(width: 200, height: 200))
     }
 }
 #endif
