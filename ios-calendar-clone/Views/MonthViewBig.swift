@@ -9,7 +9,7 @@ import calendar_support
 import Combine
 import UIKit
 
-class MonthViewBig: UICollectionViewCell {
+class MonthView: UICollectionViewCell {
     var bag = Set<AnyCancellable>()
     
     @Published
@@ -64,7 +64,7 @@ class MonthViewBig: UICollectionViewCell {
     }
 }
 
-extension MonthViewBig: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension MonthView: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         item.days.count
     }
@@ -104,7 +104,7 @@ import SwiftUI
 @available(iOS 13.0, *)
 struct MonthViewPreview: PreviewProvider {
     static var previews: some View {
-        MonthViewBig()
+        MonthView()
             .swiftUIView()
             .previewLayout(.fixed(width: 200, height: 200))
     }
